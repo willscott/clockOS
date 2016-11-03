@@ -122,15 +122,15 @@ byte clock_color[11][5];   //colors for clock faces,  10 faces with 5 colors eac
 //                                                               seconds - bit 4 = trace mode
 const byte default_color[11][5] =       //clock face 1 factory default colors
   { {0,0,0,0,0},                        //not used currently, for future use
-    {2|traceSec,1,1,4|everyHour,0},     //face 1   green trace second, red minute, red hour, blue every hour marker, no pendulum
-    {2,1,1,4|twelthHour,4},             //face 2   green second, red minute, red hour, blue 12th hour markers, blue pendulum
-    {2,1,1,4|everyHour,0},              //face 3   green second, red minute, red hour, blue every hour markers, no pendulum
-    {0,1,1,4|qtrHour,0},                //face 4   no second, red minute, red hour, blue qtr hour markers, no pendulum
-    {4|traceSec,1,1,6|everyHour,1},     //face 5   green second, red minute, red hour, blue qtr hour markers, no pendulum
-    {0,1,4,0,0},                //face 6
-    {0,1,4,6|twelthHour,0},             //face 7
-    {0,1,4,6|qtrHour,0},              //face 8
-    {0,2,4,6|everyHour,0},              //face 9
+    {0,2,1,4|everyHour,0},     //face 1   green trace second, red minute, red hour, blue every hour marker, no pendulum
+    {0,2,1,4|twelthHour,0},             //face 2   green second, red minute, red hour, blue 12th hour markers, blue pendulum
+    {0,2,1,4|qtrHour,0},              //face 3   green second, red minute, red hour, blue every hour markers, no pendulum
+    {0,2,1,4,0},                //face 4   no second, red minute, red hour, blue qtr hour markers, no pendulum
+    {0,5,4,1|qtrHour,0},     //face 5   green second, red minute, red hour, blue qtr hour markers, no pendulum
+    {0,1,4,2,0},                //face 6
+    {0,1,4,2|twelthHour,0},             //face 7
+    {0,1,4,2|qtrHour,0},              //face 8
+    {0,2,4,2|everyHour,0},              //face 9
     {1,2,4,0,0}                         //face 10 (tracer)
    };
 //===========================  Start of functions  ===============================================================
@@ -228,29 +228,20 @@ void getDateDs1307(byte *second,
 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 void draw_qtr_hour_markers(void)          //only display alt hours (5) (bit 3 is not set
        {
-        if (old_minute >= 1)              //display 00:00 dots if minute hand is not there
-            {
-            Serial.write(0xF1);            //turn on\off  led command
-            if (old_hour != 0)
-               {Serial.write(0x03);}      //led on seconds,minutes and hour ring
-            else
-                {Serial.write(0x01);}     //only update led on seconds ring if hour hand is here
-            int i = 0;                    //assign zero to varible and send varible
-            Serial.write(i);              //light up the 00:00 second
-            Serial.write(hour_marker_color & 0x07);  //send color argument
-            Serial.write(0x03);
-            }
+         int i = 0;
+        if (old_minute != 0 && old_hour != 0)
+         {led_write(1,i,hour_marker_color & 0x07);}
 
-        if (old_minute != 12)
+        if (old_minute != 12 && old_hour * 6 != 12)
             {led_write(1,12,hour_marker_color & 0x07);}
 
-         if (old_minute != 24)
+         if (old_minute != 24 && old_hour *6 != 24)
             {led_write(1,24,hour_marker_color & 0x07);}
 
-        if (old_minute != 36)
+        if (old_minute != 36 && old_hour * 6 != 36)
             {led_write(1,36,hour_marker_color & 0x07);}
 
-        if (old_minute != 48)
+        if (old_minute != 48 && old_hour *6 != 48)
             {led_write(1,48,hour_marker_color & 0x07);}
         }
 
@@ -260,31 +251,31 @@ void draw_hour_markers(void)                                      //hour markers
         if (old_minute != 0 && old_hour != 0)                      //display 00:00 dots if minute hand is not there
             {led_write(7,0,hour_marker_color & 0x07);}               //mask off bit 4 to look up color
 
-        if (old_minute != 6 && old_hour !=6)                       //display 0:05 min dots if minute hand is not there
+        if (old_minute != 6 && old_hour*6 !=6)                       //display 0:05 min dots if minute hand is not there
             {led_write(1,6,hour_marker_color & 0x07);}
 
-        if (old_minute != 12 && old_hour !=12)                     //display 00:15 dots if minute hand is not there
-            {led_write(3,12,hour_marker_color & 0x07);}
+        if (old_minute != 12 && old_hour*6 !=12)                     //display 00:15 dots if minute hand is not there
+            {led_write(1,12,hour_marker_color & 0x07);}
 
-        if (old_minute != 18 && old_hour !=18)                    //display 0:20 dots if minute hand is not there
+        if (old_minute != 18 && old_hour*6 !=18)                    //display 0:20 dots if minute hand is not there
             {led_write(1,18,hour_marker_color & 0x07);}
 
-        if (old_minute != 24 && old_hour !=24)                    //display 0:25 dots if minute hand is not there
+        if (old_minute != 24 && old_hour*6 !=24)                    //display 0:25 dots if minute hand is not there
             {led_write(1,24,hour_marker_color & 0x07);}
 
-        if (old_minute != 30 && old_hour !=30)                    //display 0:30 dots if minute hand is not there
-            {led_write(3,30,hour_marker_color & 0x07);}
+        if (old_minute != 30 && old_hour*6 !=30)                    //display 0:30 dots if minute hand is not there
+            {led_write(1,30,hour_marker_color & 0x07);}
 
-        if (old_minute != 36 && old_hour !=36)                    //display 0:35 dots if minute hand is not there
+        if (old_minute != 36 && old_hour*6 !=36)                    //display 0:35 dots if minute hand is not there
             {led_write(1,36,hour_marker_color & 0x07);}
 
-        if (old_minute != 42 && old_hour !=42)                    //display 0:40 dots if minute hand is not there
+        if (old_minute != 42 && old_hour*6 !=42)                    //display 0:40 dots if minute hand is not there
             {led_write(1,42,hour_marker_color & 0x07);}
 
-        if (old_minute != 48 && old_hour !=48)                    //display :0:45 dots if minute hand is not there
-            {led_write(3,48,hour_marker_color & 0x07);}
+        if (old_minute != 48 && old_hour*6 !=48)                    //display :0:45 dots if minute hand is not there
+            {led_write(1,48,hour_marker_color & 0x07);}
 
-        if (old_minute != 54 && old_hour !=54)                    //display 0:55 dots if minute hand is not there
+        if (old_minute != 54 && old_hour*6 !=54)                    //display 0:55 dots if minute hand is not there
             {led_write(1,54,hour_marker_color & 0x07);}
 
       }
@@ -340,18 +331,26 @@ void dot_clock(void) {
    decmin = (int)(0.6 * (float)(totalmin10 % 100));
 
 
-   if (decmin == old_minute) {
+   if (second == old_second) {
      return;
    }
+   old_second = second;
 
    // erase old hour if needed.
    if (dechr != old_hour) {
-     arc_write(6, old_hour * 6, old_hour * 6 + 5, Clear);
+     led_write(3, old_hour * 6, Clear);
+     led_write(3, old_hour * 6 + 1, Clear);
+     led_write(3, old_hour * 6 + 2, Clear);
+     led_write(3, old_hour * 6 + 3, Clear);
+     led_write(3, old_hour * 6 + 4, Clear);
+     led_write(3, old_hour * 6 + 5, Clear);
      old_hour = dechr;
    }
 
    // erase old minute.
-   led_write(7, old_minute, Clear);
+   if (decmin != old_minute) {
+     led_write(7, old_minute, Clear);
+   }
 
   // draw hour markers.
   if (bitRead(hour_marker_color,4) == 1)     //bit 4 (0001 0000) signifies that only the 12th hour is displayed
@@ -368,7 +367,12 @@ void dot_clock(void) {
   }
 
   // Draw hour bar.
-  arc_write(6, dechr * 6, dechr * 6 + 5, hour_color);
+  led_write(3, dechr * 6, hour_color);
+  led_write(3, dechr * 6 + 1, hour_color);
+  led_write(3, dechr * 6 + 2, hour_color);
+  led_write(3, dechr * 6 + 3, hour_color);
+  led_write(3, dechr * 6 + 4, hour_color);
+  led_write(3, dechr * 6 + 5, hour_color);
 
   //draw minute.
   led_write(7,decmin,minute_color);          //update minutes
